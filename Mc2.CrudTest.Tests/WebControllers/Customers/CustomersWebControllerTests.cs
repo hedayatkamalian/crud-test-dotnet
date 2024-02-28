@@ -1,5 +1,7 @@
 ﻿using AutoFixture;
 using FluentAssertions;
+using Mc2.CrudTest.Application.Dtos;
+using Mc2.CrudTest.Application.Queries.Customers;
 using Mc2.CrudTest.Domain.Commands;
 using Mc2.CrudTest.Presentation.Server.Requests.Customers;
 using Mc2.CrudTest.SharedKernel.Domain.Abstraction;
@@ -69,5 +71,35 @@ public class CustomersWebControllerTests
 
         result.Should().NotBeNull();
         result.Should().BeOfType<CreatedResult>();
+    }
+
+    [Fact]
+    public async Task Get_Should_Return_OK_With_CustomerDto_Result_When_QueryResult_Has_No_Error()
+    {
+        var mediatorMock = new Mock<IMediator>();
+        var serviceResult = new ServiceQueryResult<CustomerDto>(ValidDataSamples.CustomerDto);
+        mediatorMock.Setup(m => m.Send(It.IsAny<CustomerGetQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(serviceResult);
+
+        var customerController = new Presentation.Server.UseCases.Customers.Get.CustomersController(mediatorMock.Object);
+        var result = await customerController.Get(_fixture.Create<long>(), _fixture.Create<CancellationToken>());
+
+        result.Should().NotBeNull();
+        result.Should().BeOfType<OkObjectResult>();
+        ((OkObjectResult)result).Value.Should().BeOfType<CustomerDto>();
+    }
+
+    [Fact]
+    public async Task Get_Should_Return_NotFound_When_QueryResult_Has_NotFound_Error()
+    {
+        var mediatorMock = new Mock<IMediator>();
+        var serviceResult = new ServiceQueryResult<CustomerDto>(null as CustomerDto);
+        mediatorMock.Setup(m => m.Send(It.IsAny<CustomerGetQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(serviceResult);
+
+        var customerController = new Presentation.Server.UseCases.Customers.Get.CustomersController(mediatorMock.Object);
+        var result = await customerController.Get(_fixture.Create<long>(), _fixture.Create<CancellationToken>());
+
+        result.Should().NotBeNull();
+        result.Should().BeOfType<NotFoundResult>();
+
     }
 }
