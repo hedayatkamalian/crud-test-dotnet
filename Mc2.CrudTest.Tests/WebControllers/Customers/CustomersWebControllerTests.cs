@@ -147,4 +147,19 @@ public class CustomersWebControllerTests
         result.Should().NotBeNull();
         result.Should().BeOfType<NotFoundResult>();
     }
+
+    [Fact]
+    public async Task GetAll_Should_Return_OK_AnyTime()
+    {
+        var mediatorMock = new Mock<IMediator>();
+        var serviceResult = new ServiceQueryResult<IList<CustomerDto>>(new List<CustomerDto> { ValidDataSamples.CustomerDto });
+        mediatorMock.Setup(m => m.Send(It.IsAny<CustomerGetAllQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(serviceResult);
+
+        var customerController = new Presentation.Server.UseCases.Customers.GetAll.CustomersController(mediatorMock.Object);
+        var result = await customerController.GetAll(_fixture.Create<CancellationToken>());
+
+        result.Should().NotBeNull();
+        result.Should().BeOfType<OkObjectResult>();
+        ((OkObjectResult)result).Value.Should().BeAssignableTo<IList<CustomerDto>>();
+    }
 }
