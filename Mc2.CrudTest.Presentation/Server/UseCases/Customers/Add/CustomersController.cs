@@ -25,7 +25,9 @@ namespace Mc2.CrudTest.Presentation.Server.UseCases.Customers.Add
             var command = new CustomerAddCommand(request.FirstName, request.LastName, request.PhoneNumber, request.Email, request.DateOfBirth, request.BankAccount);
             var result = await _mediator.Send(command, cancellationToken);
 
-            result.Uri = result.Id?.ToString() ?? " ";
+            const string locationActionName = nameof(Get.CustomersController.Get);
+            result.Uri = $"{Url.Action(locationActionName, new { id = result.Id })}";
+
             return FromServiceResult(result);
         }
     }
