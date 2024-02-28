@@ -28,6 +28,7 @@ public class CustomersWebControllerTests
         mediatorMock.Setup(m => m.Send(It.IsAny<CustomerAddCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(serviceResult);
 
         var customerController = new Presentation.Server.UseCases.Customers.Add.CustomersController(mediatorMock.Object);
+        customerController.Url = GeneralFixtures.CreateMockUrlHelper().Object;
 
         var request = new CustomerAddRequest
         {
@@ -56,6 +57,7 @@ public class CustomersWebControllerTests
         mediatorMock.Setup(m => m.Send(It.IsAny<CustomerAddCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(serviceResult);
 
         var customerController = new Presentation.Server.UseCases.Customers.Add.CustomersController(mediatorMock.Object);
+        customerController.Url = GeneralFixtures.CreateMockUrlHelper().Object;
 
         var request = new CustomerAddRequest
         {
@@ -101,5 +103,48 @@ public class CustomersWebControllerTests
         result.Should().NotBeNull();
         result.Should().BeOfType<NotFoundResult>();
 
+    }
+
+
+    [Fact]
+    public async Task Edit_Should_Return_Unsupportable_Entity_When_Command_Result_Has_Validation_Error()
+    {
+        var mediatorMock = new Mock<IMediator>();
+        var serviceResult = new ServiceCommandResult(CommandErrorType.Validation);
+        mediatorMock.Setup(m => m.Send(It.IsAny<CustomerEditCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(serviceResult);
+
+        var customerController = new Presentation.Server.UseCases.Customers.Edit.CustomersController(mediatorMock.Object);
+        var result = await customerController.Edit(_fixture.Create<long>(), ValidDataSamples.CustomerEditRequest, _fixture.Create<CancellationToken>());
+
+        result.Should().NotBeNull();
+        result.Should().BeOfType<UnprocessableEntityObjectResult>();
+    }
+
+    [Fact]
+    public async Task Edit_Should_Return_NoContent_When_Command_Result_Is_Successfull()
+    {
+        var mediatorMock = new Mock<IMediator>();
+        var serviceResult = new ServiceCommandResult();
+        mediatorMock.Setup(m => m.Send(It.IsAny<CustomerEditCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(serviceResult);
+
+        var customerController = new Presentation.Server.UseCases.Customers.Edit.CustomersController(mediatorMock.Object);
+        var result = await customerController.Edit(_fixture.Create<long>(), ValidDataSamples.CustomerEditRequest, _fixture.Create<CancellationToken>());
+
+        result.Should().NotBeNull();
+        result.Should().BeOfType<NoContentResult>();
+    }
+
+    [Fact]
+    public async Task Edit_Should_Return_Not_Found_When_Command_Result_Is_NotFound()
+    {
+        var mediatorMock = new Mock<IMediator>();
+        var serviceResult = new ServiceCommandResult(CommandErrorType.NotFound);
+        mediatorMock.Setup(m => m.Send(It.IsAny<CustomerEditCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(serviceResult);
+
+        var customerController = new Presentation.Server.UseCases.Customers.Edit.CustomersController(mediatorMock.Object);
+        var result = await customerController.Edit(_fixture.Create<long>(), ValidDataSamples.CustomerEditRequest, _fixture.Create<CancellationToken>());
+
+        result.Should().NotBeNull();
+        result.Should().BeOfType<NotFoundResult>();
     }
 }

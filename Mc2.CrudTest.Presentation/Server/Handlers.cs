@@ -15,6 +15,7 @@ namespace Mc2.CrudTest.Presentation
         public static IServiceCollection RegisterHandlers(this IServiceCollection services)
         {
             services.AddScoped<IRequestHandler<CustomerAddCommand, ServiceCommandResult>, CustomerAddCommandHandler>();
+            services.AddScoped<IRequestHandler<CustomerEditCommand, ServiceCommandResult>, CustomerEditCommandHandler>();
             services.AddScoped<IRequestHandler<CustomerGetQuery, ServiceQueryResult<CustomerDto>>, CustomerGetQueryHandler>();
 
             return services;
