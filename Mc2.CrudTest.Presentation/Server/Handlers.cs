@@ -16,6 +16,7 @@ namespace Mc2.CrudTest.Presentation
         {
             services.AddScoped<IRequestHandler<CustomerAddCommand, ServiceCommandResult>, CustomerAddCommandHandler>();
             services.AddScoped<IRequestHandler<CustomerEditCommand, ServiceCommandResult>, CustomerEditCommandHandler>();
+            services.AddScoped<IRequestHandler<CustomerDeleteCommand, ServiceCommandResult>, CustomerDeleteCommandHandler>();
             services.AddScoped<IRequestHandler<CustomerGetQuery, ServiceQueryResult<CustomerDto>>, CustomerGetQueryHandler>();
             services.AddScoped<IRequestHandler<CustomerGetAllQuery, ServiceQueryResult<IList<CustomerDto>>>, CustomerGetAllQueryHandler>();
 
