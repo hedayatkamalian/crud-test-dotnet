@@ -162,4 +162,32 @@ public class CustomersWebControllerTests
         result.Should().BeOfType<OkObjectResult>();
         ((OkObjectResult)result).Value.Should().BeAssignableTo<IList<CustomerDto>>();
     }
+
+    [Fact]
+    public async Task Delete_Should_Return_Not_Found_When_Command_Result_Is_NotFound()
+    {
+        var mediatorMock = new Mock<IMediator>();
+        var serviceResult = new ServiceCommandResult(CommandErrorType.NotFound);
+        mediatorMock.Setup(m => m.Send(It.IsAny<CustomerDeleteCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(serviceResult);
+
+        var customerController = new Presentation.Server.UseCases.Customers.Delete.CustomersController(mediatorMock.Object);
+        var result = await customerController.Delete(_fixture.Create<long>(), _fixture.Create<CancellationToken>());
+
+        result.Should().NotBeNull();
+        result.Should().BeOfType<NotFoundResult>();
+    }
+
+    [Fact]
+    public async Task Delete_Should_Return_NoContent_When_Command_Result_Is_Successful()
+    {
+        var mediatorMock = new Mock<IMediator>();
+        var serviceResult = new ServiceCommandResult();
+        mediatorMock.Setup(m => m.Send(It.IsAny<CustomerDeleteCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(serviceResult);
+
+        var customerController = new Presentation.Server.UseCases.Customers.Delete.CustomersController(mediatorMock.Object);
+        var result = await customerController.Delete(_fixture.Create<long>(), _fixture.Create<CancellationToken>());
+
+        result.Should().NotBeNull();
+        result.Should().BeOfType<NoContentResult>();
+    }
 }
